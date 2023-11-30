@@ -1,1 +1,1 @@
-{ "dependencies": { "@enonic/js-utils": "^1.7.1", "dayjs": "^1.11.10", "surgeon": "^3.16.4" } }
+{ "dependencies": { "@enonic/js-utils": "^1.7.1", "base-64": "^1.0.0", "dayjs": "^1.11.10", "surgeon": "^3.16.4" } }

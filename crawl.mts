@@ -1,6 +1,7 @@
 // import {isFunction} from '@enonic/js-utils/value/isFunction';
 import {isString} from '@enonic/js-utils/value/isString';
 import dayjs from 'dayjs';
+import {encode} from 'base-64';
 // import 'dayjs/locale/nb';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 // import utc from 'dayjs/plugin/utc';
@@ -29,7 +30,17 @@ function isFunction<FunctionShape extends Function>(value: unknown) :value is Fu
 
 function delay(time) {
 	return new Promise(resolve => setTimeout(resolve, time));
-  }
+}
+
+function _arrayBufferToBase64( buffer ) {
+	var binary = '';
+	var bytes = new Uint8Array( buffer );
+	var len = bytes.byteLength;
+	for (var i = 0; i < len; i++) {
+		binary += String.fromCharCode( bytes[ i ] );
+	}
+	return encode( binary );
+}
 
 // const INGEST_BASE = 'http://127.0.0.1:8080/ingest';
 const INGEST_BASE = 'http://127.0.0.1:8080/webapp/com.enonic.app.explorer/api/v2/documents';
@@ -351,6 +362,10 @@ const CAR = {
 	// 	'remove a',
 	// 	READ_AND_CLEAN
 	// ],
+	bildeUrls: [
+		`select "[data-carousel-container=''] img[src]" ${ZERO_OR_MORE}`,
+		'read attribute src'
+	]
 }
 
 const res = await fetch("https://www.finn.no/car/used/search.html", {
@@ -385,6 +400,21 @@ for (const link of data.links) {
 	// console.log(html2);
 	const data2 = operate(CAR, html2);
 	// console.log(data2);
+
+	// Download one image and base64 encode it
+	if (data2.bildeUrls && data2.bildeUrls.length > 0) {
+		const res3 = await fetch(data2.bildeUrls[0], {
+			method: "GET",
+		});
+		if (res3.ok) {
+			const buffer = await res3.arrayBuffer();
+			const base64 = _arrayBufferToBase64(buffer);
+			data2.bildeBase64 = [base64];
+		}
+	}
+	// console.log(data2);
+
+
 	const req = {
 		method: 'POST',
 		// mode: 'cors', // no-cors, *cors, same-origin
