@@ -152,6 +152,10 @@ const CAR_LIST = {
 };
 
 const CAR = {
+	json: [
+		`select #horseshoe-config ${FIRST_OR_NULL}`,
+		'rtc'
+	],
 	title: [
 		SELECT_AD,
 		`select 'h1' ${FIRST_OR_NULL}`,
@@ -176,6 +180,13 @@ const CAR = {
 		`contents '.media__body div' 'Modellår'`,
 		'siblings',
 		'rtc',
+		'parseInt'
+	],
+	Kilometer: [
+		`contents 'div' 'Kilometer'`,
+		'siblings',
+		'rtc',
+		'replaceAllWhiteSpace',
 		'parseInt'
 	],
 	Girkasse: [
@@ -414,33 +425,105 @@ for (const link of data.links) {
 	}
 	// console.log(data2);
 
+	// console.log(data2.json);
+	if (data2.json) {
+		const obj = JSON.parse(data2.json);
+		if (obj?.xandr?.feed) {
+			[
+				'km',
+				'co2',
+				'pris',
+				'merke',
+				'model',
+				'seter',
+				'variant',
+				'finnkode',
+				'girkasse',
+				'drivstoff',
+				'hjuldrift',
+				'karosseri',
+				'regnummer',
+				'aarsmodell',
+				'hovedbilde',
+				'hovedfarge',
+				'postnummer',
+				'antalleiere',
+				'omregavgift',
+				'hestekrefter',
+				'avgiftsklasse'
+			].forEach((key) => {
+				data2[key] = obj.xandr.feed[key];
+			});
+		// } else {
+		// 	console.log(obj);
+		}
+		delete data2.json;
+	}
+
+	if (!data2.model && data2.Modellår) {
+		data2.model = data2.Modellår;
+	}
+
+	if (data2.model) {
+		data2.yearsOld = new Date().getFullYear() - data2.model;
+		// console.log(data2.yearsOld);
+	} else {
+		console.log('no model')
+	}
+
+	if (!data2.pris && data2.Totalpris) {
+		data2.pris = data2.Totalpris;
+	}
+
+	if (!data2.pris) {
+		console.log('no pris')
+	}
+
+	if (data2.pris && data2.yearsOld) {
+		data2.prisPerÅr = data2.pris / data2.yearsOld;
+		// console.log(data2.prisPerÅr);
+	}
+
+	if (!data2.km && data2.Kilometer) {
+		data2.km = data2.Kilometer;
+	}
+
+	if (data2.pris && data2.km) {
+		data2.prisPerKm = data2.pris / data2.km;
+		// console.log(data2.prisPerKm);
+	} else {
+		console.log('no km')
+	}
+
+	if (!data2.hestekrefter && data2.Effekt) {
+		data2.hestekrefter = data2.Effekt;
+	}
+
+	if (data2.pris && data2.hestekrefter) {
+		data2.prisPerHestekreft = data2.pris / data2.hestekrefter;
+		// console.log(data2.prisPerHestekreft);
+	} else {
+		console.log('no hestekrefter')
+	}
+
+	// console.log(data2);
 
 	const req = {
 		method: 'POST',
-		// mode: 'cors', // no-cors, *cors, same-origin
-		// cache: 'no-cache',
-		// credentials: 'omit', // include, *same-origin, omit
 		headers: {
-			// 'Accept': 'application/json',
 			'authorization': `Explorer-Api-Key ${API_KEY}`,
 			'content-type': 'application/json',
 		},
-		// redirect: 'follow', // manual, *follow, error
-		// referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-		// Bulk
-		// body: JSON.stringify({
-		// 	collection: COLLETION,
-		// 	document: data2
-		// }),
-		// Single
 		body: JSON.stringify(data2),
 	};
 	// console.log(req);
+
 	const res3 = await fetch(`${INGEST_BASE}/${COLLETION}?documentType=${DOCUMENT_TYPE}&requireValid=false&returnDocument=false`, req);
 	// console.log(res3);
 	const json = await res3.json();
 	// console.log(json);
 	console.log(`${i+1}/${data.links.length} ${link} ${json.id} done.`);
+
 	i++;
 	await delay(1000);
 }
