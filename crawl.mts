@@ -480,8 +480,11 @@ for (const link of data.links) {
 	}
 
 	if (data2.pris && data2.yearsOld) {
-		data2.prisPerÅr = data2.pris / data2.yearsOld;
+		const prisPerÅr = data2.pris / data2.yearsOld;
 		// console.log(data2.prisPerÅr);
+		if (prisPerÅr > 0) {
+			data2.prisPerÅr = prisPerÅr;
+		}
 	}
 
 	if (!data2.km && data2.Kilometer) {
@@ -489,8 +492,11 @@ for (const link of data.links) {
 	}
 
 	if (data2.pris && data2.km) {
-		data2.prisPerKm = data2.pris / data2.km;
+		const prisPerKm = data2.pris / data2.km;
 		// console.log(data2.prisPerKm);
+		if (prisPerKm > 0) {
+			data2.prisPerKm = prisPerKm;
+		}
 	} else {
 		console.log('no km')
 	}
@@ -500,8 +506,11 @@ for (const link of data.links) {
 	}
 
 	if (data2.pris && data2.hestekrefter) {
-		data2.prisPerHestekreft = data2.pris / data2.hestekrefter;
+		const prisPerHestekreft = data2.pris / data2.hestekrefter;
 		// console.log(data2.prisPerHestekreft);
+		if (prisPerHestekreft > 0) {
+			data2.prisPerHestekreft = prisPerHestekreft;
+		}
 	} else {
 		console.log('no hestekrefter')
 	}
