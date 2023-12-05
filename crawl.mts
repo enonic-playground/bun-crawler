@@ -460,22 +460,25 @@ for (const link of data.links) {
 		delete data2.json;
 	}
 
-	if (!data2.model && data2.Modellår) {
-		data2.model = data2.Modellår;
+	if (!data2.aarsmodell && data2.Modellår) {
+		data2.aarsmodell = data2.Modellår;
 	}
 
-	if (data2.model) {
-		data2.yearsOld = new Date().getFullYear() - data2.model;
+	if (data2.aarsmodell) {
+		data2.aarsmodell = parseInt(data2.aarsmodell, 10);
+		data2.yearsOld = new Date().getFullYear() - data2.aarsmodell;
 		// console.log(data2.yearsOld);
 	} else {
-		console.log('no model')
+		console.log('no aarsmodell')
 	}
 
 	if (!data2.pris && data2.Totalpris) {
 		data2.pris = data2.Totalpris;
 	}
 
-	if (!data2.pris) {
+	if (data2.pris) {
+		data2.pris = parseInt(data2.pris, 10);
+	} else {
 		console.log('no pris')
 	}
 
@@ -492,6 +495,7 @@ for (const link of data.links) {
 	}
 
 	if (data2.pris && data2.km) {
+		data2.km = parseInt(data2.km, 10);
 		const prisPerKm = data2.pris / data2.km;
 		// console.log(data2.prisPerKm);
 		if (prisPerKm > 0) {
